@@ -2,8 +2,14 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <title>World Cup 2026 – Match Alarm & Game</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="World Cup 2026">
+<meta name="mobile-web-app-capable" content="yes">
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 /* =======================================================
@@ -164,7 +170,7 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
   display: none; 
   position: fixed;
   top: 0; left: 0;
-  width: 100vh;  /* Adattamento forzato orizzontale */
+  width: 100vh;  
   height: 100vw;
   transform-origin: top left;
   transform: rotate(90deg) translateY(-100%);
@@ -350,6 +356,20 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
 </div>
 
 <script>
+// FUNZIONE PER CHIEDERE IL FULLSCREEN SUI BROWSER COMPATIBILI (iOS INCLUSO)
+function requestNativeFullscreen() {
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(err => console.log(err));
+    } else if (docEl.webkitRequestFullscreen) { /* Safari / iOS */
+        docEl.webkitRequestFullscreen();
+    } else if (docEl.mozRequestFullScreen) {
+        docEl.mozRequestFullScreen();
+    } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+    }
+}
+
 // --- LOGICA MODAL MENU ---
 const menuModal = document.getElementById('menuModal');
 document.getElementById('openMenuBtn').addEventListener('click', () => {
@@ -369,7 +389,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
         imgEl.src = `img/campo${val}.png`;
     }
     
-    // Al cambio del campo rigenera la posizione della palla
     if (window.randomizePositions && !window.isCountdownMode) window.randomizePositions();
 });
 
@@ -415,6 +434,9 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   window.isCountdownMode = false;
 
   document.getElementById('startAlarmBtn').addEventListener('click', () => {
+    // Forza il fullscreen non appena l'utente interagisce
+    requestNativeFullscreen();
+    
     document.getElementById('menuModal').style.display = 'none';
     if (MATCHES.length === 0) return;
 
@@ -439,7 +461,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
             clearInterval(interval);
             window.isCountdownMode = false;
             document.getElementById('gameModal').style.display = 'flex';
-            if (window.resizeGame) window.resizeGame(); // Ridimensiona per sicurezza quando viene aperto
+            if (window.resizeGame) window.resizeGame(); 
             calculateTimeAndTrigger(); 
         }
     }, 1000);
@@ -458,6 +480,13 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     ln.setAttribute('stroke-width',long?'2':'1');
     ticks.appendChild(ln);
   }
+
+  // Scorciatoia per attivare il fullscreen toccando lo sfondo in un punto qualsiasi
+  document.body.addEventListener('click', (e) => {
+     if(e.target === document.body || e.target.classList.contains('rotated-wrap')) {
+         requestNativeFullscreen();
+     }
+  });
 
   function W(){return field.offsetWidth}
   function H(){return field.offsetHeight}
@@ -655,15 +684,11 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   canvas.width = W;
   canvas.height = H;
 
-  // FUNZIONE PER RISOLVERE LA SCALA SU MOBILE
   window.resizeGame = function() {
       const containerEl = document.getElementById('game-container');
       if (!containerEl) return;
-      // Per via della rotazione 90 gradi di chi lo racchiude
-      // l'altezza reale dello schermo funge da larghezza del nostro scenario
       const availW = window.innerHeight; 
       const availH = window.innerWidth;
-      // Scala il gioco in modo da non sforare l'area del dispositivo
       const scale = Math.min((availW * 0.95) / W, (availH * 0.95) / H);
       containerEl.style.transform = `scale(${scale})`;
   };
@@ -734,7 +759,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       
       let backGrad = ctx.createLinearGradient(0, backBottom, 0, backTop);
       backGrad.addColorStop(0, 'rgba(186, 255, 37, 0.15)'); backGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
-      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
+      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, top); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
       
       ctx.fillStyle = 'rgba(186, 255, 37, 0.05)';
       ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backLeft, backTop); ctx.fill();
@@ -843,7 +868,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       requestAnimationFrame(draw);
   }
 
-  // COORDINATE MAPPING OTTIMIZZATO PER ROTAZIONE 90 GRADI
   function getCanvasPos(e) {
       const rect = canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -895,8 +919,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (openTrophyBtn && gameModal) {
     openTrophyBtn.addEventListener('click', () => {
+      // Forza la richiesta di Fullscreen su iOS anche cliccando sulla coppa
+      requestNativeFullscreen();
       gameModal.style.display = 'flex';
-      if (window.resizeGame) window.resizeGame(); // Forza il corretto resize appena lo apri
+      if (window.resizeGame) window.resizeGame(); 
     });
   }
 });
