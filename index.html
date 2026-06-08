@@ -2,16 +2,15 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <title>World Cup 2026 – Match Alarm & Game</title>
 
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Match Alarm"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Match Alarm" />
 
-<meta name="mobile-web-app-capable" content="yes"/>
-<link rel="manifest" href="manifest.json"/>
-
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="manifest.json" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 /* =======================================================
@@ -667,8 +666,11 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   window.resizeGame = function() {
       const containerEl = document.getElementById('game-container');
       if (!containerEl) return;
+      // Per via della rotazione 90 gradi di chi lo racchiude
+      // l'altezza reale dello schermo funge da larghezza del nostro scenario
       const availW = window.innerHeight; 
       const availH = window.innerWidth;
+      // Scala il gioco in modo da non sforare l'area del dispositivo
       const scale = Math.min((availW * 0.95) / W, (availH * 0.95) / H);
       containerEl.style.transform = `scale(${scale})`;
   };
@@ -746,8 +748,8 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
       ctx.strokeStyle = neonColor; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, top); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
-      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
+      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.stroke();
       ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
 
       if (ball.active) {
@@ -901,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openTrophyBtn && gameModal) {
     openTrophyBtn.addEventListener('click', () => {
       gameModal.style.display = 'flex';
-      if (window.resizeGame) window.resizeGame(); 
+      if (window.resizeGame) window.resizeGame(); // Forza il corretto resize appena lo apri
     });
   }
 });
