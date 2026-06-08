@@ -686,8 +686,20 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
   const W = 730;
   const H = 470;
-  canvas.width = W;
-  canvas.height = H;
+  
+  // 1. Calcola la densità dei pixel dello schermo (es. iPhone è 2 o 3)
+  const dpr = window.devicePixelRatio || 1;
+  
+  // 2. Moltiplica i pixel reali del canvas per non sgranare
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  
+  // 3. Scala il contesto per poter continuare a usare le tue coordinate normali
+  ctx.scale(dpr, dpr);
+  
+  // 4. Forza l'antialiasing (smussa i bordi della palla quando ruota)
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
 
   // FUNZIONE PER RISOLVERE LA SCALA SU MOBILE
   window.resizeGame = function() {
