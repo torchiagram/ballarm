@@ -102,7 +102,6 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
   display:flex;align-items:center;gap:12px;
   cursor:grab;user-select:none;z-index:20;
   box-shadow:0 4px 24px rgba(0,0,0,.4);
-  /* Aggiunta transizione di base per il rientro elastico */
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .notification.dragging{cursor:grabbing}
@@ -160,51 +159,33 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
   font-size: 14px;
 }
 
+/* GAME MODAL FIXED FOR MOBILE */
 #gameModal {
   display: none; 
   position: fixed;
   top: 0; left: 0;
-  width: 100%; height: 100%;
+  width: 100vh;  /* Adattamento forzato orizzontale */
+  height: 100vw;
+  transform-origin: top left;
+  transform: rotate(90deg) translateY(-100%);
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   touch-action: none;
-  overflow: hidden;
   align-items: center;
   justify-content: center;
   z-index: 99999;
 }
 
-#device-screen {
-  position: relative;
-  width: 1080px;
-  height: 1920px;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-@media (max-height: 2000px) { #device-screen { transform: scale(0.45); } }
-@media (max-height: 950px) { #device-screen { transform: scale(0.4); } }
-@media (max-height: 800px) { #device-screen { transform: scale(0.35); } }
-
-#screen-wrapper { 
+#game-container { 
   position: relative; 
-  width: 1024px; 
-  height: 576px; 
-  background: transparent;
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
+  width: 730px; 
+  height: 470px; 
+  border-radius: 44px; 
   overflow: hidden; 
-  user-select: none; 
-  transform: rotate(90deg) scale(1.5);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
   transform-origin: center center;
 }
-
-#game-container { position: relative; width: 730px; height: 470px; border-radius: 44px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
 #game-container canvas { display: block; width: 100%; height: 100%; }
 
 #timerIcon { position: absolute; top: 20px; right: 24px; width: 54px; height: 54px; background: #b0ff33; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 25; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -345,28 +326,24 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
 </div>
 
 <div id="gameModal">
-  <div id="device-screen">
-    <div id="screen-wrapper">
-      <div id="game-container">
-        <div id="timerIcon">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="13" r="6" stroke="#1e222b" stroke-width="2" fill="none"/>
-            <path d="M12 10v3l2 2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
-            <path d="M9 3h6M12 3v3M5 7l2-2M19 7l-2-2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
+  <div id="game-container">
+    <div id="timerIcon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="13" r="6" stroke="#1e222b" stroke-width="2" fill="none"/>
+        <path d="M12 10v3l2 2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 3h6M12 3v3M5 7l2-2M19 7l-2-2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
 
-        <canvas id="gameCanvas"></canvas>
-        <div id="aimDot"></div>
-        <div id="msg">GOAL!</div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="aimDot"></div>
+    <div id="msg">GOAL!</div>
 
-        <div class="fifa-hud-banner">
-          <div class="hud-status-dot"></div>
-          <div class="hud-text-container">
-            <span class="hud-main-text">Segna per continuare</span>
-            <span class="hud-sub-text">Fai goal per uscire</span>
-          </div>
-        </div>
+    <div class="fifa-hud-banner">
+      <div class="hud-status-dot"></div>
+      <div class="hud-text-container">
+        <span class="hud-main-text">Segna per continuare</span>
+        <span class="hud-sub-text">Fai goal per uscire</span>
       </div>
     </div>
   </div>
@@ -403,26 +380,18 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     {imgSrc:'img/match2.png', emoji:'🇲🇽🇿🇦', label:'Messico vs Sud Africa', time:'8:00 PM', date:'14 Giugno 2026', country:'MEX'},
   ];
 
-  // LOGICA BLINDATA: Trasforma l'orario (es. "14:00" o "2:30 AM") in gradi perfetti
   function parseTimeToAngle(timeStr) {
     if (!timeStr) return 0;
-    
-    // Pulisce la stringa prendendo solo i numeri, es: "14:00" -> "14", "00"
     let cleanTime = timeStr.trim().toLowerCase().replace(/[^\d:]/g, '');
     let parts = cleanTime.split(':');
     let h = parseInt(parts[0], 10) || 0;
     let m = parseInt(parts[1], 10) || 0;
-    
-    // Convertiamo in orologio a 12 ore (quadrante)
     if (h > 12) h -= 12;
-    if (h === 12) h = 0; // Le 12 corrispondono al grado 0 (in alto)
-    
+    if (h === 12) h = 0; 
     let totalMins = (h * 60) + m;
-    // 12 ore = 720 minuti = 360 gradi -> 1 grado equivale esattamente a 2 minuti
     return (totalMins / 2) % 360; 
   }
 
-  // Applica la conversione in gradi
   MATCHES.forEach(m => {
     m.angle = parseTimeToAngle(m.time);
   });
@@ -440,21 +409,17 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   let closestPinAngle = 0;
   
   let alarmTriggered = false;
-  // Timer di sicurezza per evitare che il popup blocchi lo schermo all'avvio
   let initialLoadGuard = true;
   setTimeout(() => { initialLoadGuard = false; }, 2000);
 
-  // Variabile per gestire lo stato del countdown (impedisce la sovrascrittura del testo)
   window.isCountdownMode = false;
 
-  // --- LOGICA PULSANTE "AVVIA" (COUNTDOWN MANUALE) ---
   document.getElementById('startAlarmBtn').addEventListener('click', () => {
     document.getElementById('menuModal').style.display = 'none';
     if (MATCHES.length === 0) return;
 
     window.isCountdownMode = true;
     
-    // Imposta la palla in prossimità visiva del match (circa 2 gradi di distanza)
     const targetMatch = MATCHES[0]; 
     ballAngle = (targetMatch.angle - 2 + 360) % 360; 
     
@@ -474,7 +439,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
             clearInterval(interval);
             window.isCountdownMode = false;
             document.getElementById('gameModal').style.display = 'flex';
-            // Forza il ricalcolo per rimettere il testo normale quando finisce il countdown
+            if (window.resizeGame) window.resizeGame(); // Ridimensiona per sicurezza quando viene aperto
             calculateTimeAndTrigger(); 
         }
     }, 1000);
@@ -504,7 +469,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     const w=W(); if(!w)return;
     lblTop.style.fontSize=Math.round(w*0.016)+'px';
     lblBot.style.fontSize=Math.round(w*0.016)+'px';
-    // clkNum viene scalato direttamente in calculateTimeAndTrigger
   }
 
   function posOnRing(deg,elW,elH){
@@ -542,7 +506,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     if (MATCHES.length === 0) return;
     let minDiff = 360;
     
-    // Trova la distanza minore IN SENSO ORARIO verso il pin più vicino
     MATCHES.forEach(m => {
       let d = (m.angle - ballAngle + 360) % 360;
       if (d < minDiff) {
@@ -553,20 +516,17 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
     updateArc(ballAngle, closestPinAngle);
 
-    // Blocchiamo il testo se è in corso il countdown manuale di 8 secondi
     if (window.isCountdownMode) return;
 
-    // Mappatura matematica: 1 grado = 2 minuti esatti.
     let totalMinutes = Math.round(minDiff * 2);
     let hours = Math.floor(totalMinutes / 60);
     let mins = totalMinutes % 60;
 
     const w = W();
     
-    // Miglioramento: Se ci sono sia ore che minuti (es. 1 ora e 30 min) mostra "1h 30m"
     if (hours > 0 && mins > 0) {
       clkNum.textContent = hours + "h " + mins + "m";
-      if(w) clkNum.style.fontSize = Math.round(w*0.06) + 'px'; // font poco più piccolo per farcelo stare
+      if(w) clkNum.style.fontSize = Math.round(w*0.06) + 'px'; 
       lblTop.textContent = "MANCANO";
       lblBot.textContent = "AL MATCH";
     } else if (hours > 0) {
@@ -581,17 +541,19 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       lblBot.textContent = mins === 1 ? "MINUTO" : "MINUTI";
     }
 
-    // Se mancano 15 minuti o meno scatta la sveglia (solo se la pagina è attiva da più di 2 sec)
     if (totalMinutes <= 15 && !alarmTriggered && !initialLoadGuard) {
       alarmTriggered = true;
       const gameModal = document.getElementById('gameModal');
-      if (gameModal) gameModal.style.display = 'flex';
+      if (gameModal) {
+        gameModal.style.display = 'flex';
+        if (window.resizeGame) window.resizeGame();
+      }
     }
   }
 
   window.randomizePositions = function() {
     ballAngle = Math.floor(Math.random() * 360);
-    alarmTriggered = false; // Reset dell'allarme al cambio di posizione
+    alarmTriggered = false; 
     
     buildPins();
     updatePositions();
@@ -638,7 +600,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     isDraggingNotif = true;
     notif.classList.add('dragging');
     startY = e.touches ? e.touches[0].clientY : e.clientY;
-    // Rimuove la transizione per far sì che la notifica segua perfettamente il dito
     notif.style.transition = 'none'; 
   }
 
@@ -647,10 +608,9 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     currentY = e.touches ? e.touches[0].clientY : e.clientY;
     let deltaY = currentY - startY;
 
-    // Permette il trascinamento solo verso il basso
     if (deltaY > 0) {
       notif.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
-      e.preventDefault(); // Impedisce lo scroll della pagina
+      e.preventDefault(); 
     }
   }
 
@@ -660,18 +620,15 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     notif.classList.remove('dragging');
     let deltaY = currentY - startY;
 
-    // Ripristina la transizione morbida
     notif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
 
     if (deltaY > 50) {
-      // Se trascinata giù per più di 50px, scivola via e scompare
       notif.style.transform = `translateX(-50%) translateY(150%)`;
       notif.style.opacity = '0';
       setTimeout(() => {
         notif.style.display = 'none';
       }, 300);
     } else {
-      // Altrimenti torna su a molla
       notif.style.transform = `translateX(-50%) translateY(0)`;
     }
   }
@@ -697,6 +654,22 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   const H = 470;
   canvas.width = W;
   canvas.height = H;
+
+  // FUNZIONE PER RISOLVERE LA SCALA SU MOBILE
+  window.resizeGame = function() {
+      const containerEl = document.getElementById('game-container');
+      if (!containerEl) return;
+      // Per via della rotazione 90 gradi di chi lo racchiude
+      // l'altezza reale dello schermo funge da larghezza del nostro scenario
+      const availW = window.innerHeight; 
+      const availH = window.innerWidth;
+      // Scala il gioco in modo da non sforare l'area del dispositivo
+      const scale = Math.min((availW * 0.95) / W, (availH * 0.95) / H);
+      containerEl.style.transform = `scale(${scale})`;
+  };
+
+  window.addEventListener('resize', window.resizeGame);
+  window.resizeGame();
 
   const goalLeft = 205;
   const goalRight = 525;
@@ -809,7 +782,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
                       setTimeout(() => {
                           document.getElementById('gameModal').style.display = 'none';
                           resetBall();
-                          // Rimescola le posizioni dopo aver segnato per rigiocare
                           if(window.randomizePositions && !window.isCountdownMode) window.randomizePositions();
                       }, 1500);
                   }
@@ -871,12 +843,18 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       requestAnimationFrame(draw);
   }
 
+  // COORDINATE MAPPING OTTIMIZZATO PER ROTAZIONE 90 GRADI
   function getCanvasPos(e) {
       const rect = canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const xVisual = clientX - rect.left; const yVisual = clientY - rect.top;
-      const x = yVisual * (W / rect.height); const y = (rect.width - xVisual) * (H / rect.width);
+      
+      const xVisual = clientY - rect.top;
+      const yVisual = rect.right - clientX;
+      
+      const x = (xVisual / rect.height) * W; 
+      const y = (yVisual / rect.width) * H;
+      
       return { x, y };
   }
 
@@ -918,6 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openTrophyBtn && gameModal) {
     openTrophyBtn.addEventListener('click', () => {
       gameModal.style.display = 'flex';
+      if (window.resizeGame) window.resizeGame(); // Forza il corretto resize appena lo apri
     });
   }
 });
