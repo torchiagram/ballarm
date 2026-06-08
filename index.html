@@ -2,10 +2,14 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a1c1f"/>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22World%20Cup%202026%22%2C%22short_name%22%3A%22World%20Cup%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231a1c1f%22%2C%22theme_color%22%3A%22%231a1c1f%22%7D"/>
 
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="World Cup 2026"/>
 
 <title>World Cup 2026 – Match Alarm & Game</title>
@@ -23,7 +27,7 @@
   --text:#f0f2f4;
   --muted:#8a8f9a;
 }
-html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-family:'DM Sans',sans-serif;color:var(--text);padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-family:'DM Sans',sans-serif;color:var(--text)}
 
 .rotated-wrap{
   position:fixed;top:0;left:0;
