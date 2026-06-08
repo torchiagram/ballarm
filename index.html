@@ -32,13 +32,23 @@
 html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-family:'DM Sans',sans-serif;color:var(--text)}
 
 .rotated-wrap{
-  position:fixed;top:0;left:0;
-  width:100vh;height:100vw;
-  transform-origin:top left;
-  transform:rotate(90deg) translateY(-100%);
-  background:var(--dark);
-  display:flex;align-items:center;justify-content:center;
-  padding:19px;overflow:hidden;
+  position: fixed;
+  /* CAMBIATO QUI */
+  width: 95vh;
+  height: 95vw;
+  top: 2.5vw;
+  left: 2.5vh;
+  /* FINE CAMBIO */
+  
+  transform-origin: top left;
+  transform: rotate(90deg) translateY(-100%) scale(0.9);
+  background: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  gap: 20px;         
+  overflow: hidden;
 }
 
 .sidebar-left{display:flex;flex-direction:column;gap:62px;align-items:center;margin-right:0px;flex-shrink:0}
