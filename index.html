@@ -2,10 +2,10 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="World Cup 2026"/>
 
 <title>World Cup 2026 – Match Alarm & Game</title>
@@ -739,7 +739,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       
       let backGrad = ctx.createLinearGradient(0, backBottom, 0, backTop);
       backGrad.addColorStop(0, 'rgba(186, 255, 37, 0.15)'); backGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
-      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, top); ctx.lineTo(backRight, backBottom); ctx.fill();
+      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
       
       ctx.fillStyle = 'rgba(186, 255, 37, 0.05)';
       ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backLeft, backTop); ctx.fill();
@@ -747,7 +747,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       ctx.strokeStyle = neonColor; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
       ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
-      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); stroke();
+      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.stroke();
       ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
 
       if (ball.active) {
