@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a1c1f"/>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22World%20Cup%202026%22%2C%22short_name%22%3A%22World%20Cup%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231a1c1f%22%2C%22theme_color%22%3A%22%231a1c1f%22%7D"/>
+
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="World Cup 2026"/>
+
 <title>World Cup 2026 – Match Alarm & Game</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -58,7 +67,7 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
 .field-bg{
   display:block;
   max-width:100%;
-  max-height:calc(100vw - 20px); /* CORRETTO: 100vw è l'altezza reale in modalità landscape ruotata */
+  max-height:calc(100vh - 20px);
   object-fit:contain;
   border-radius:18px;
 }
@@ -164,7 +173,7 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
   display: none; 
   position: fixed;
   top: 0; left: 0;
-  width: 100vh;  
+  width: 100vh;  /* Adattamento forzato orizzontale */
   height: 100vw;
   transform-origin: top left;
   transform: rotate(90deg) translateY(-100%);
@@ -369,6 +378,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
         imgEl.src = `img/campo${val}.png`;
     }
     
+    // Al cambio del campo rigenera la posizione della palla
     if (window.randomizePositions && !window.isCountdownMode) window.randomizePositions();
 });
 
@@ -438,7 +448,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
             clearInterval(interval);
             window.isCountdownMode = false;
             document.getElementById('gameModal').style.display = 'flex';
-            if (window.resizeGame) window.resizeGame(); 
+            if (window.resizeGame) window.resizeGame(); // Ridimensiona per sicurezza quando viene aperto
             calculateTimeAndTrigger(); 
         }
     }, 1000);
@@ -654,11 +664,15 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   canvas.width = W;
   canvas.height = H;
 
+  // FUNZIONE PER RISOLVERE LA SCALA SU MOBILE
   window.resizeGame = function() {
       const containerEl = document.getElementById('game-container');
       if (!containerEl) return;
+      // Per via della rotazione 90 gradi di chi lo racchiude
+      // l'altezza reale dello schermo funge da larghezza del nostro scenario
       const availW = window.innerHeight; 
       const availH = window.innerWidth;
+      // Scala il gioco in modo da non sforare l'area del dispositivo
       const scale = Math.min((availW * 0.95) / W, (availH * 0.95) / H);
       containerEl.style.transform = `scale(${scale})`;
   };
@@ -736,8 +750,8 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
       ctx.strokeStyle = neonColor; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); stroke();
-      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
+      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); stroke();
       ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
 
       if (ball.active) {
@@ -838,9 +852,10 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       requestAnimationFrame(draw);
   }
 
+  // COORDINATE MAPPING OTTIMIZZATO PER ROTAZIONE 90 GRADI
   function getCanvasPos(e) {
       const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientY;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       
       const xVisual = clientY - rect.top;
@@ -890,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openTrophyBtn && gameModal) {
     openTrophyBtn.addEventListener('click', () => {
       gameModal.style.display = 'flex';
-      if (window.resizeGame) window.resizeGame(); 
+      if (window.resizeGame) window.resizeGame(); // Forza il corretto resize appena lo apri
     });
   }
 });
