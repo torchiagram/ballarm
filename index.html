@@ -2,18 +2,20 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"/>
 <title>World Cup 2026 – Match Alarm & Game</title>
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="World Cup 2026">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Match Alarm"/>
+
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="manifest.json"/>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 /* =======================================================
-   STILI DI BASE & CONTENIMENTO RIGIDO
+   STILI 
    ======================================================= */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -24,65 +26,49 @@
   --text:#f0f2f4;
   --muted:#8a8f9a;
 }
-html,body{
-  width:100%;height:100%;
+html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-family:'DM Sans',sans-serif;color:var(--text)}
+
+.rotated-wrap{
+  position:fixed;top:0;left:0;
+  width:100vh;height:100vw;
+  transform-origin:top left;
+  transform:rotate(90deg) translateY(-100%);
   background:var(--dark);
-  overflow:hidden;
-  font-family:'DM Sans',sans-serif;
-  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  padding:10px;overflow:hidden;
 }
 
-/* Il Viewport occupa tutto lo schermo e fa da maschera */
-#app-viewport {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: var(--dark);
-  overflow: hidden;
-}
-
-/* Il Box di Gioco fisso a 1920x1080 che viene scalato via JS */
-#app-container {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 1920px; height: 1080px;
-  background: var(--dark);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 40px;
-  transform-origin: center center;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-/* INTERFACCIA SCALATA PER 1920x1080 */
-.sidebar-left{display:flex;flex-direction:column;gap:120px;align-items:center;flex-shrink:0}
-.btn-menu, .trophy-btn{width:100px;height:100px;border-radius:50%;background:var(--surface);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--lime)}
-.btn-menu svg, .trophy-btn svg{width:44px;height:44px}
-.match-card{background:var(--lime);border-radius:28px;padding:24px 30px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:140px}
-.match-card svg{width:44px;height:44px}
-.mc-label{font-size:20px;font-weight:500;color:#1a1c1f;letter-spacing:.04em}
-.mc-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:#1a1c1f;line-height:1}
+.sidebar-left{display:flex;flex-direction:column;gap:62px;align-items:center;margin-right:6px;flex-shrink:0}
+.btn-menu{width:42px;height:42px;border-radius:50%;background:var(--surface);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--lime)}
+.btn-menu svg{width:18px;height:18px}
+.match-card{background:var(--lime);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:58px}
+.match-card svg{width:19px;height:19px}
+.mc-label{font-size:10px;font-weight:500;color:#1a1c1f;letter-spacing:.04em}
+.mc-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#1a1c1f;line-height:1}
+.trophy-btn{width:42px;height:42px;border-radius:50%;background:var(--surface);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.trophy-btn svg{width:20px;height:20px;color:var(--lime)}
 
 .field-wrap{
   position:relative;
-  flex:1; height:100%;
+  flex:1;min-width:0;min-height:0;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
+
 .field-img-root{
   position:relative;
   display:inline-flex;
-  border-radius:36px;
+  border-radius:18px;
   overflow:hidden;
-  max-width:100%; max-height:100%;
+  max-width:100%;
+  max-height:100%;
 }
 .field-bg{
   display:block;
-  max-height:1000px;
+  max-width:100%;
+  max-height:calc(100vh - 20px);
   object-fit:contain;
-  border-radius:36px;
+  border-radius:18px;
 }
 
 .clock-ring{
@@ -91,278 +77,311 @@ html,body{
   width:44%;aspect-ratio:1/1;
   border-radius:50%;
   background:rgba(255,255,255,.12);
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(2px);
   display:flex;align-items:center;justify-content:center;
   z-index:5;
-  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.05);
 }
 .arc-svg{position:absolute;width:100%;height:100%}
 .clock-center{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;position:relative}
-.clk-lbl{font-size:24px;font-weight:500;letter-spacing:.12em;color:rgba(255,255,255,.8);text-transform:uppercase}
-.clk-num{font-family:'Bebas Neue',sans-serif;color:#fff;font-size:130px;line-height:1;margin:10px 0 -10px;text-align:center;white-space:nowrap}
+.clk-lbl{font-weight:500;letter-spacing:.12em;color:rgba(255,255,255,.8);text-transform:uppercase}
+.clk-num{font-family:'Bebas Neue',sans-serif;color:#fff;line-height:1;margin:0 0 -4px;text-align:center;white-space:nowrap;}
 
-.ball{position:absolute;z-index:10;pointer-events:none;transition: transform 0.5s ease}
-.ball img{width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
-.ball-fallback{width:100%;height:100%;border-radius:50%;background:#d4f55b;border:4px solid rgba(0,0,0,.25)}
+.ball{position:absolute;z-index:10;pointer-events:none;transition: transform 0.5s ease;}
+.ball img{width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.ball-fallback{width:100%;height:100%;border-radius:50%;background:#d4f55b;border:2px solid rgba(0,0,0,.25);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 
 .match-pin{position:absolute;z-index:9}
 .pin-circle{
   width:100%;height:100%;border-radius:50%;overflow:hidden;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  box-shadow:0 2px 10px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;
   background: rgba(255,255,255,.14);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
 }
 .pin-circle img{width:134%;height:134%;object-fit:cover;border-radius:50%}
 
 .notification{
-  position:absolute;bottom:40px;left:50%;
+  position:absolute;bottom:10px;left:50%;
   transform:translateX(-50%);
   background:var(--card);
-  border-radius:32px;
-  padding:24px 36px;width:600px;
-  display:flex;align-items:center;gap:24px;
+  border-radius:16px;
+  padding:14px 18px;width:min(300px,60%);
+  display:flex;align-items:center;gap:12px;
   cursor:grab;user-select:none;z-index:20;
-  box-shadow:0 8px 40px rgba(0,0,0,.4);
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .notification.dragging{cursor:grabbing}
-.drag-handle{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:80px;height:6px;background:rgba(255,255,255,.18);border-radius:3px}
-.notif-icon{width:72px;height:72px;border-radius:20px;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.notif-icon svg{width:36px;height:36px;color:var(--muted)}
+.drag-handle{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:32px;height:3px;background:rgba(255,255,255,.18);border-radius:2px}
+.notif-icon{width:36px;height:36px;border-radius:10px;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-icon svg{width:18px;height:18px;color:var(--muted)}
 .notif-body{flex:1}
-.notif-label{font-size:20px;color:var(--muted);margin-bottom:2px}
-.notif-date{font-size:28px;font-weight:600}
-.notif-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.notif-time{font-size:28px;font-weight:600;color:var(--lime)}
-.notif-country{font-size:20px;color:var(--muted)}
+.notif-label{font-size:11px;color:var(--muted);margin-bottom:1px}
+.notif-date{font-size:14px;font-weight:600}
+.notif-right{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.notif-time{font-size:14px;font-weight:600;color:var(--lime)}
+.notif-country{font-size:11px;color:var(--muted)}
 
-.sidebar-right{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.fifa-badge img{width:140px;opacity:.5}
+.sidebar-right{display:flex;flex-direction:column;align-items:center;margin-left:6px;flex-shrink:0}
+.fifa-badge img{width:16vw;min-width:36px;max-width:72px;opacity:.5}
 
-/* POPUP CONFIGURATORI */
+/* --- POPUP STILI --- */
 #menuModal {
-  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center;
+  display: none;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
 }
 .modal-content {
-  background: var(--card); padding: 50px; border-radius: 36px; display: flex;
-  flex-direction: column; gap: 30px; min-width: 450px; border: 2px solid var(--surface);
+  background: var(--card);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 250px;
+  border: 1px solid var(--surface);
 }
 #startAlarmBtn {
-  background: var(--lime); color: var(--dark); border: none; padding: 24px;
-  border-radius: 18px; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 28px;
+  background: var(--lime);
+  color: var(--dark);
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  font-size: 16px;
 }
 #templateSelect {
-  padding: 20px; border-radius: 14px; background: var(--surface); color: white; border: none; font-size: 24px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: white;
+  border: none;
+  font-size: 14px;
 }
 
-/* AREA GIOCO RIGIDA E PROPORZIONATA */
+/* GAME MODAL FIXED FOR MOBILE */
 #gameModal {
-  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  align-items: center; justify-content: center; z-index: 99999;
+  display: none; 
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vh;  /* Adattamento forzato orizzontale */
+  height: 100vw;
+  transform-origin: top left;
+  transform: rotate(90deg) translateY(-100%);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  touch-action: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
 }
+
 #game-container { 
-  position: relative; width: 1460px; height: 940px; border-radius: 60px; 
-  overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  position: relative; 
+  width: 730px; 
+  height: 470px; 
+  border-radius: 44px; 
+  overflow: hidden; 
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  transform-origin: center center;
 }
 #game-container canvas { display: block; width: 100%; height: 100%; }
 
-#timerIcon { position: absolute; top: 40px; right: 48px; width: 100px; height: 100px; background: #b0ff33; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 25; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-#timerIcon svg { width: 54px; height: 54px; fill: #1e222b; }
+#timerIcon { position: absolute; top: 20px; right: 24px; width: 54px; height: 54px; background: #b0ff33; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 25; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+#timerIcon svg { width: 30px; height: 30px; fill: #1e222b; }
 
-#aimDot { position: absolute; width: 60px; height: 60px; border: 4px dashed #b0ff33; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 30; display: none; }
-#aimDot::after { content: ''; position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; background: #b0ff33; border-radius: 50%; transform: translate(-50%, -50%); }
+#aimDot { position: absolute; width: 36px; height: 36px; border: 3px dashed #b0ff33; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 30; display: none; }
+#aimDot::after { content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #b0ff33; border-radius: 50%; transform: translate(-50%, -50%); }
 
-#msg { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: #b0ff33; font-size: 64px; font-weight: 900; padding: 24px 72px; border-radius: 100px; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 40; letter-spacing: 4px; border: 4px solid #b0ff33; text-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+#msg { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: #b0ff33; font-size: 32px; font-weight: 900; padding: 12px 36px; border-radius: 50px; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 40; letter-spacing: 2px; border: 2px solid #b0ff33; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
 .fifa-hud-banner {
-  position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(90deg, rgba(26, 30, 36, 0.95) 0%, rgba(15, 17, 20, 0.98) 100%);
-  border-left: 8px solid #b0ff33; border-top: 2px solid rgba(176, 255, 51, 0.25);
-  padding: 16px 40px; display: flex; align-items: center; gap: 28px; z-index: 22; pointer-events: none;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(26, 30, 36, 0.92) 0%, rgba(15, 17, 20, 0.96) 100%);
+  border-left: 4px solid #b0ff33;
+  border-top: 1px solid rgba(176, 255, 51, 0.25);
+  border-bottom: 1px solid rgba(176, 255, 51, 0.15);
+  border-right: 1px solid rgba(176, 255, 51, 0.15);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 22;
+  pointer-events: none;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.hud-status-dot { width: 14px; height: 14px; background: #b0ff33; border-radius: 50%; box-shadow: 0 0 16px #b0ff33; }
+
+.hud-status-dot {
+  width: 7px;
+  height: 7px;
+  background: #b0ff33;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #b0ff33, 0 0 4px #b0ff33;
+  animation: hudPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .hud-text-container { display: flex; flex-direction: column; }
-.hud-main-text { color: #ffffff; font-size: 26px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
-.hud-sub-text { color: rgba(255, 255, 255, 0.4); font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+.hud-main-text { color: #ffffff; font-size: 14px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; line-height: 1.2; }
+.hud-sub-text { color: rgba(255, 255, 255, 0.4); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+
+@keyframes hudPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
 </style>
 </head>
 <body>
 
-<div id="app-viewport">
-  <div id="app-container">
-    
-    <div id="menuModal">
-      <div class="modal-content">
-        <button id="startAlarmBtn">Avvia</button>
-        <select id="templateSelect">
-          <option value="base">Base</option>
-          <option value="dallas">Dallas</option>
-          <option value="guadalajara">Guadalajara</option>
-          <option value="huston">Huston</option>
-        </select>
-      </div>
+<div class="rotated-wrap">
+  <div id="menuModal">
+    <div class="modal-content">
+      <button id="startAlarmBtn">Avvia</button>
+      <select id="templateSelect">
+        <option value="base">Base</option>
+        <option value="dallas">Dallas</option>
+        <option value="guadalajara">Guadalajara</option>
+        <option value="huston">Huston</option>
+      </select>
     </div>
+  </div>
 
-    <div class="sidebar-left">
-      <button class="btn-menu" id="openMenuBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
-        </svg>
-      </button>
-      <div class="match-card">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#1a1c1f" stroke-width="1.8">
-          <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-        </svg>
-        <span class="mc-label">Match</span>
-        <span class="mc-num" id="matchCount">2</span>
-      </div>
-      <button class="trophy-btn" id="openPopupBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M8 21h8M12 17v4M17 4h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-.5"/>
-          <path d="M7 4H5a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h.5"/>
-          <path d="M7 4h10v8a5 5 0 0 1-10 0V4z"/>
-        </svg>
-      </button>
+  <div class="sidebar-left">
+    <button class="btn-menu" id="openMenuBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
+      </svg>
+    </button>
+    <div class="match-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1a1c1f" stroke-width="1.8">
+        <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+      </svg>
+      <span class="mc-label">Match</span>
+      <span class="mc-num" id="matchCount">2</span>
     </div>
+    <button class="trophy-btn" id="openPopupBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 21h8M12 17v4M17 4h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-.5"/>
+        <path d="M7 4H5a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h.5"/>
+        <path d="M7 4h10v8a5 5 0 0 1-10 0V4z"/>
+      </svg>
+    </button>
+  </div>
 
-    <div class="field-wrap" id="fieldWrap">
-      <div class="field-img-root" id="field">
-        <img class="field-bg" id="fieldBg" src="img/campobase.png" alt="campo"
-             onerror="this.style.background='#7fd43a';this.style.width='1200px';this.style.height='780px'"/>
+  <div class="field-wrap" id="fieldWrap">
+    <div class="field-img-root" id="field">
+      <img class="field-bg" id="fieldBg" src="img/campobase.png" alt="campo"
+           onerror="this.style.background='#7fd43a';this.style.width='520px';this.style.height='338px'"/>
 
-        <div class="clock-ring">
-          <svg class="arc-svg" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
-            <path id="arcPath" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.5" stroke-linecap="round"/>
-            <g id="ticks"></g>
-          </svg>
-          <div class="clock-center">
-            <span class="clk-lbl" id="lblTop">MANCANO</span>
-            <span class="clk-num" id="clkNum">0</span>
-            <span class="clk-lbl" id="lblBot">MINUTI</span>
-          </div>
-        </div>
-
-        <div class="ball" id="ball">
-          <img src="img/palla.png" alt="palla"
-               onerror="this.style.display='none';document.getElementById('ballFb').style.display='block'"/>
-          <div id="ballFb" class="ball-fallback" style="display:none"></div>
-        </div>
-
-        <div id="pins"></div>
-
-        <div class="notification" id="notif">
-          <div class="drag-handle"></div>
-          <div class="notif-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-            </svg>
-          </div>
-          <div class="notif-body">
-            <div class="notif-label">Match salvato</div>
-            <div class="notif-date">13 Giugno 2026</div>
-          </div>
-          <div class="notif-right">
-            <div class="notif-time">2:30 AM</div>
-            <div class="notif-country">USA</div>
-          </div>
+      <div class="clock-ring">
+        <svg class="arc-svg" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <path id="arcPath" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.5" stroke-linecap="round"/>
+          <g id="ticks"></g>
+        </svg>
+        <div class="clock-center">
+          <span class="clk-lbl" id="lblTop">MANCANO</span>
+          <span class="clk-num" id="clkNum">0</span>
+          <span class="clk-lbl" id="lblBot">MINUTI</span>
         </div>
       </div>
-    </div>
 
-    <div class="sidebar-right">
-      <div class="fifa-badge">
-        <img src="img/logofifa.png" alt="FIFA 26"/>
+      <div class="ball" id="ball">
+        <img src="img/palla.png" alt="palla"
+             onerror="this.style.display='none';document.getElementById('ballFb').style.display='block'"/>
+        <div id="ballFb" class="ball-fallback" style="display:none"></div>
       </div>
-    </div>
 
-    <div id="gameModal">
-      <div id="game-container">
-        <div id="timerIcon">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="13" r="6" stroke="#1e222b" stroke-width="2" fill="none"/>
-            <path d="M12 10v3l2 2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
-            <path d="M9 3h6M12 3v3M5 7l2-2M19 7l-2-2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
+      <div id="pins"></div>
+
+      <div class="notification" id="notif">
+        <div class="drag-handle"></div>
+        <div class="notif-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
           </svg>
         </div>
-        <canvas id="gameCanvas"></canvas>
-        <div id="aimDot"></div>
-        <div id="msg">GOAL!</div>
-        <div class="fifa-hud-banner">
-          <div class="hud-status-dot"></div>
-          <div class="hud-text-container">
-            <span class="hud-main-text">Segna per continuare</span>
-            <span class="hud-sub-text">Fai goal per uscire</span>
-          </div>
+        <div class="notif-body">
+          <div class="notif-label">Match salvato</div>
+          <div class="notif-date">13 Giugno 2026</div>
+        </div>
+        <div class="notif-right">
+          <div class="notif-time">2:30 AM</div>
+          <div class="notif-country">USA</div>
         </div>
       </div>
     </div>
+  </div>
 
+  <div class="sidebar-right">
+    <div class="fifa-badge">
+      <img src="img/logofifa.png" alt="FIFA 26"/>
+    </div>
+  </div>
+</div>
+
+<div id="gameModal">
+  <div id="game-container">
+    <div id="timerIcon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="13" r="6" stroke="#1e222b" stroke-width="2" fill="none"/>
+        <path d="M12 10v3l2 2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 3h6M12 3v3M5 7l2-2M19 7l-2-2" stroke="#1e222b" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="aimDot"></div>
+    <div id="msg">GOAL!</div>
+
+    <div class="fifa-hud-banner">
+      <div class="hud-status-dot"></div>
+      <div class="hud-text-container">
+        <span class="hud-main-text">Segna per continuare</span>
+        <span class="hud-sub-text">Fai goal per uscire</span>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-// --- MASTER SCALER REALE (CSS TRANSFORMS BLINDATE) ---
-let isCurrentlyRotated = false;
-
-function masterResize() {
-    const container = document.getElementById('app-container');
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    
-    const targetW = 1920;
-    const targetH = 1080;
-    
-    if (vh > vw) {
-        // iPhone tenuto in verticale (Portrait): ruota a 90° e scala geometricamente
-        isCurrentlyRotated = true;
-        const scale = Math.min(vh / targetW, vw / targetH);
-        container.style.transform = `translate(-50%, -50%) rotate(90deg) scale(${scale})`;
-    } else {
-        // iPhone ruotato o desktop (Landscape): scala liscia standard
-        isCurrentlyRotated = false;
-        const scale = Math.min(vw / targetW, vh / targetH);
-        container.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    }
-}
-
-window.addEventListener('resize', masterResize);
-window.addEventListener('orientationchange', masterResize);
-document.addEventListener('DOMContentLoaded', masterResize);
-
-// Request Native Fullscreen wrapper
-function requestNativeFullscreen() {
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) docEl.requestFullscreen().catch(err => console.log(err));
-    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-}
-
-// Scatto fullscreen automatico al tocco delle bande esterne
-document.body.addEventListener('click', (e) => {
-    if(e.target.id === 'app-viewport' || e.target === document.body) {
-        requestNativeFullscreen();
-    }
+// --- LOGICA MODAL MENU ---
+const menuModal = document.getElementById('menuModal');
+document.getElementById('openMenuBtn').addEventListener('click', () => {
+    menuModal.style.display = 'flex';
 });
 
-// --- LOGICA DI NAVIGAZIONE E POPUP ---
-const menuModal = document.getElementById('menuModal');
-document.getElementById('openMenuBtn').addEventListener('click', () => { menuModal.style.display = 'flex'; });
-menuModal.addEventListener('click', (e) => { if (e.target === menuModal) menuModal.style.display = 'none'; });
+menuModal.addEventListener('click', (e) => {
+    if (e.target === menuModal) menuModal.style.display = 'none';
+});
 
 document.getElementById('templateSelect').addEventListener('change', (e) => {
     const val = e.target.value;
     const imgEl = document.getElementById('fieldBg');
-    imgEl.src = (val === 'base') ? 'img/campobase.png' : `img/campo${val}.png`;
+    if (val === 'base') {
+        imgEl.src = 'img/campobase.png';
+    } else {
+        imgEl.src = `img/campo${val}.png`;
+    }
+    
+    // Al cambio del campo rigenera la posizione della palla
     if (window.randomizePositions && !window.isCountdownMode) window.randomizePositions();
 });
 
-// --- ALLINEAMENTO ELEMENTI PRINCIPALI (SCRIPT 1) ---
+// --- LOGICA SCRIPT 1 (MATCH ALARM) ---
 {
   const MATCHES = [
     {imgSrc:'img/match1.png', emoji:'🇺🇸🇨🇷', label:'USA vs Costa Rica',   time:'2:30 AM', date:'13 Giugno 2026', country:'USA'},
@@ -375,23 +394,28 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     let parts = cleanTime.split(':');
     let h = parseInt(parts[0], 10) || 0;
     let m = parseInt(parts[1], 10) || 0;
-    if (h > 12) h -= 12; if (h === 12) h = 0;
-    return ((h * 60 + m) / 2) % 360;
+    if (h > 12) h -= 12;
+    if (h === 12) h = 0; 
+    let totalMins = (h * 60) + m;
+    return (totalMins / 2) % 360; 
   }
 
-  MATCHES.forEach(m => { m.angle = parseTimeToAngle(m.time); });
+  MATCHES.forEach(m => {
+    m.angle = parseTimeToAngle(m.time);
+  });
 
-  const field = document.getElementById('field');
-  const ballEl = document.getElementById('ball');
-  const clkNum = document.getElementById('clkNum');
-  const arcPath = document.getElementById('arcPath');
-  const ticks = document.getElementById('ticks');
-  const pinsEl = document.getElementById('pins');
-  const lblTop = document.getElementById('lblTop');
-  const lblBot = document.getElementById('lblBot');
+  const field    = document.getElementById('field');
+  const ballEl   = document.getElementById('ball');
+  const clkNum   = document.getElementById('clkNum');
+  const arcPath  = document.getElementById('arcPath');
+  const ticks    = document.getElementById('ticks');
+  const pinsEl   = document.getElementById('pins');
+  const lblTop   = document.getElementById('lblTop');
+  const lblBot   = document.getElementById('lblBot');
   
   let ballAngle = Math.floor(Math.random() * 360);
   let closestPinAngle = 0;
+  
   let alarmTriggered = false;
   let initialLoadGuard = true;
   setTimeout(() => { initialLoadGuard = false; }, 2000);
@@ -399,19 +423,22 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   window.isCountdownMode = false;
 
   document.getElementById('startAlarmBtn').addEventListener('click', () => {
-    requestNativeFullscreen();
     document.getElementById('menuModal').style.display = 'none';
     if (MATCHES.length === 0) return;
 
     window.isCountdownMode = true;
-    const targetMatch = MATCHES[0];
-    ballAngle = (targetMatch.angle - 2 + 360) % 360;
+    
+    const targetMatch = MATCHES[0]; 
+    ballAngle = (targetMatch.angle - 2 + 360) % 360; 
     
     let countdown = 8;
     lblTop.textContent = "TRA";
     lblBot.textContent = "SECONDI";
     clkNum.textContent = countdown;
     
+    const w = W();
+    if (w) clkNum.style.fontSize = Math.round(w*0.09) + 'px';
+
     const interval = setInterval(() => {
         countdown--;
         if (countdown > 0) {
@@ -420,7 +447,8 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
             clearInterval(interval);
             window.isCountdownMode = false;
             document.getElementById('gameModal').style.display = 'flex';
-            calculateTimeAndTrigger();
+            if (window.resizeGame) window.resizeGame(); // Ridimensiona per sicurezza quando viene aperto
+            calculateTimeAndTrigger(); 
         }
     }, 1000);
   });
@@ -445,6 +473,12 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   function ballSize(){return Math.round(W()*0.075)}
   function pinSize(){return Math.round(W()*0.07)}
 
+  function scaleAll(){
+    const w=W(); if(!w)return;
+    lblTop.style.fontSize=Math.round(w*0.016)+'px';
+    lblBot.style.fontSize=Math.round(w*0.016)+'px';
+  }
+
   function posOnRing(deg,elW,elH){
     const R=ringRadius(),rad=(deg-90)*Math.PI/180;
     return{x:W()/2+R*Math.cos(rad)-elW/2, y:H()/2+R*Math.sin(rad)-elH/2};
@@ -459,7 +493,8 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       const c=document.createElement('div');c.className='pin-circle';
       const img=document.createElement('img');img.src=m.imgSrc;img.alt=m.label;
       img.onerror=()=>{c.innerHTML='';c.textContent=m.emoji;};
-      c.appendChild(img);pin.appendChild(c);pinsEl.appendChild(pin);
+      c.appendChild(img);
+      pin.appendChild(c);pinsEl.appendChild(pin);
       const p=posOnRing(m.angle,ps,ps);
       pin.style.left=p.x+'px';pin.style.top=p.y+'px';
     });
@@ -478,101 +513,129 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   function calculateTimeAndTrigger() {
     if (MATCHES.length === 0) return;
     let minDiff = 360;
+    
     MATCHES.forEach(m => {
       let d = (m.angle - ballAngle + 360) % 360;
-      if (d < minDiff) { minDiff = d; closestPinAngle = m.angle; }
+      if (d < minDiff) {
+        minDiff = d;
+        closestPinAngle = m.angle;
+      }
     });
 
     updateArc(ballAngle, closestPinAngle);
+
     if (window.isCountdownMode) return;
 
     let totalMinutes = Math.round(minDiff * 2);
     let hours = Math.floor(totalMinutes / 60);
     let mins = totalMinutes % 60;
 
+    const w = W();
+    
     if (hours > 0 && mins > 0) {
       clkNum.textContent = hours + "h " + mins + "m";
-      lblTop.textContent = "MANCANO"; lblBot.textContent = "AL MATCH";
+      if(w) clkNum.style.fontSize = Math.round(w*0.06) + 'px'; 
+      lblTop.textContent = "MANCANO";
+      lblBot.textContent = "AL MATCH";
     } else if (hours > 0) {
       clkNum.textContent = hours;
-      lblTop.textContent = "MANCANO"; lblBot.textContent = hours === 1 ? "ORA" : "ORE";
+      if(w) clkNum.style.fontSize = Math.round(w*0.09) + 'px';
+      lblTop.textContent = "MANCANO";
+      lblBot.textContent = hours === 1 ? "ORA" : "ORE";
     } else {
       clkNum.textContent = mins;
-      lblTop.textContent = "MANCANO"; lblBot.textContent = mins === 1 ? "MINUTO" : "MINUTI";
+      if(w) clkNum.style.fontSize = Math.round(w*0.09) + 'px';
+      lblTop.textContent = "MANCANO";
+      lblBot.textContent = mins === 1 ? "MINUTO" : "MINUTI";
     }
 
     if (totalMinutes <= 15 && !alarmTriggered && !initialLoadGuard) {
       alarmTriggered = true;
-      document.getElementById('gameModal').style.display = 'flex';
+      const gameModal = document.getElementById('gameModal');
+      if (gameModal) {
+        gameModal.style.display = 'flex';
+        if (window.resizeGame) window.resizeGame();
+      }
     }
   }
 
   window.randomizePositions = function() {
-    ballAngle = Math.floor(Math.random() * 360); alarmTriggered = false;
-    buildPins(); updatePositions();
+    ballAngle = Math.floor(Math.random() * 360);
+    alarmTriggered = false; 
+    
+    buildPins();
+    updatePositions();
   };
 
   function updatePositions() {
-    const w=W(); if(!w) return;
+    const w=W(),h=H();
+    if(!w) return;
     const bs=ballSize();
     const R=ringRadius(),rad=(ballAngle-90)*Math.PI/180;
-    const bx=w/2+R*Math.cos(rad); const by=h=H()/2+R*Math.sin(rad);
+    const bx=w/2+R*Math.cos(rad);
+    const by=h/2+R*Math.sin(rad);
     
     ballEl.style.width=bs+'px';ballEl.style.height=bs+'px';
-    ballEl.style.left=(bx-bs/2)+'px'; ballEl.style.top =(by-bs/2)+'px';
+    ballEl.style.left=(bx-bs/2)+'px';
+    ballEl.style.top =(by-bs/2)+'px';
     ballEl.style.transform=`rotate(${ballAngle*2}deg)`;
+
     calculateTimeAndTrigger();
   }
 
-  function loop() { updatePositions(); requestAnimationFrame(loop); }
+  function loop() {
+    updatePositions();
+    requestAnimationFrame(loop);
+  }
 
-  new ResizeObserver(()=>{buildPins(); updatePositions();}).observe(field);
+  function onReady(){ scaleAll(); randomizePositions(); loop(); }
+
+  new ResizeObserver(()=>{scaleAll(); buildPins(); updatePositions();}).observe(field);
+
   const imgEl=document.getElementById('fieldBg');
-  if(imgEl.complete&&imgEl.naturalWidth>0){ buildPins(); loop(); }
-  else{ imgEl.addEventListener('load',()=>{buildPins(); loop();}); imgEl.addEventListener('error',()=>{buildPins(); loop();}); }
+  if(imgEl.complete&&imgEl.naturalWidth>0){onReady();}
+  else{imgEl.addEventListener('load',onReady);imgEl.addEventListener('error',onReady);}
 }
 
-// --- DRAG INTERATTIVO NOTIFICA SVILUPPATO SU ASSI LOGICI (SWIPE IN GIÙ) ---
+// --- LOGICA DRAG NOTIFICA (SWIPE VERSO IL BASSO) ---
 {
   const notif = document.getElementById('notif');
-  let startX = 0, startY = 0;
-  let currentX = 0, currentY = 0;
+  let startY = 0;
+  let currentY = 0;
   let isDraggingNotif = false;
 
   function onNotifStart(e) {
-    isDraggingNotif = true; notif.classList.add('dragging');
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    isDraggingNotif = true;
+    notif.classList.add('dragging');
     startY = e.touches ? e.touches[0].clientY : e.clientY;
-    notif.style.transition = 'none';
+    notif.style.transition = 'none'; 
   }
 
   function onNotifMove(e) {
     if (!isDraggingNotif) return;
-    currentX = e.touches ? e.touches[0].clientX : e.clientX;
     currentY = e.touches ? e.touches[0].clientY : e.clientY;
+    let deltaY = currentY - startY;
 
-    let deltaScreen = isCurrentlyRotated ? (currentX - startX) : (currentY - startY);
-    let currentScale = window.innerHeight > window.innerWidth ? Math.min(window.innerHeight / 1920, window.innerWidth / 1080) : Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    let deltaLocal = deltaScreen / currentScale;
-
-    if (deltaLocal > 0) {
-      notif.style.transform = `translateX(-50%) translateY(${deltaLocal}px)`;
-      e.preventDefault();
+    if (deltaY > 0) {
+      notif.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+      e.preventDefault(); 
     }
   }
 
-  function onNotifEnd() {
+  function onNotifEnd(e) {
     if (!isDraggingNotif) return;
-    isDraggingNotif = false; notif.classList.remove('dragging');
-    
-    let deltaScreen = isCurrentlyRotated ? (currentX - startX) : (currentY - startY);
-    let currentScale = window.innerHeight > window.innerWidth ? Math.min(window.innerHeight / 1920, window.innerWidth / 1080) : Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    let deltaLocal = deltaScreen / currentScale;
+    isDraggingNotif = false;
+    notif.classList.remove('dragging');
+    let deltaY = currentY - startY;
 
     notif.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-    if (deltaLocal > 100) {
-      notif.style.transform = `translateX(-50%) translateY(300px)`; notif.style.opacity = '0';
-      setTimeout(() => { notif.style.display = 'none'; }, 300);
+
+    if (deltaY > 50) {
+      notif.style.transform = `translateX(-50%) translateY(150%)`;
+      notif.style.opacity = '0';
+      setTimeout(() => {
+        notif.style.display = 'none';
+      }, 300);
     } else {
       notif.style.transform = `translateX(-50%) translateY(0)`;
     }
@@ -581,12 +644,13 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   notif.addEventListener('mousedown', onNotifStart);
   document.addEventListener('mousemove', onNotifMove);
   document.addEventListener('mouseup', onNotifEnd);
+
   notif.addEventListener('touchstart', onNotifStart, { passive: false });
   document.addEventListener('touchmove', onNotifMove, { passive: false });
   document.addEventListener('touchend', onNotifEnd);
 }
 
-// --- LOGICA SCRIPT 2 (MINIGAME DEL CALCIO AD ALTA RISOLUZIONE) ---
+// --- LOGICA SCRIPT 2 (INTERFACCIA POP-UP FIFA 26) ---
 {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
@@ -594,12 +658,33 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   const aimDot = document.getElementById('aimDot');
   const msg = document.getElementById('msg');
 
-  // Risoluzione nativa del mini-gioco adattata a 2X per nitidezza sul 1080p
-  const W = 1460; const H = 940;
-  canvas.width = W; canvas.height = H;
+  const W = 730;
+  const H = 470;
+  canvas.width = W;
+  canvas.height = H;
 
-  const goalLeft = 410; const goalRight = 1050; const goalTop = 260; const goalBottom = 580;
-  const backLeft = 490; const backRight = 970;  const backTop = 320; const backBottom = 500;
+  // FUNZIONE PER RISOLVERE LA SCALA SU MOBILE
+  window.resizeGame = function() {
+      const containerEl = document.getElementById('game-container');
+      if (!containerEl) return;
+      const availW = window.innerHeight; 
+      const availH = window.innerWidth;
+      const scale = Math.min((availW * 0.95) / W, (availH * 0.95) / H);
+      containerEl.style.transform = `scale(${scale})`;
+  };
+
+  window.addEventListener('resize', window.resizeGame);
+  window.resizeGame();
+
+  const goalLeft = 205;
+  const goalRight = 525;
+  const goalTop = 130;
+  const goalBottom = 290; 
+
+  const backLeft = 245;
+  const backRight = 485;
+  const backTop = 160;
+  const backBottom = 250; 
 
   const ballImg = new Image();
   let ballImgLoaded = false;
@@ -607,43 +692,69 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   ballImg.src = 'img/palla2.png';
 
   let ball = { 
-      x: W / 2, y: 720, z: 0, r: 44, baseR: 44,
+      x: W / 2, y: 360, z: 0, r: 22, baseR: 22,
       vx: 0, vy: 0, vz: 0, angle: 0, spin: 0,
       active: false, hasDecidedResult: false, bounceCount: 0
   };
 
   let mouse = { isDown: false };
-  let power = 0; let chargeDir = 1;
-  let targetX = W / 2; let targetY = H / 2;
+  let power = 0;
+  let chargeDir = 1;
+  let targetX = W / 2;
+  let targetY = H / 2;
 
   function draw() {
       ctx.clearRect(0, 0, W, H);
 
       let grassGrad = ctx.createLinearGradient(0, 0, 0, H);
-      grassGrad.addColorStop(0, '#53662d'); grassGrad.addColorStop(1, '#66dc3f');
-      ctx.fillStyle = grassGrad; ctx.fillRect(0, 0, W, H);
+      grassGrad.addColorStop(0, '#53662d');   
+      grassGrad.addColorStop(0.48, '#446227'); 
+      grassGrad.addColorStop(0.55, '#486a24'); 
+      grassGrad.addColorStop(0.65, '#508e2a'); 
+      grassGrad.addColorStop(1, '#66dc3f');    
+      ctx.fillStyle = grassGrad;
+      ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 2.5;
+      
       ctx.beginPath(); ctx.moveTo(0, backBottom); ctx.lineTo(W, backBottom); ctx.stroke();
 
       ctx.beginPath();
-      ctx.moveTo(280, backBottom);
-      ctx.arcTo(174, 840, 1286, 840, 30);
-      ctx.arcTo(1286, 840, 1180, backBottom, 30);
-      ctx.lineTo(1180, backBottom); ctx.stroke();
+      ctx.moveTo(140, backBottom);
+      ctx.arcTo(87, 420, 643, 420, 15);
+      ctx.arcTo(643, 420, 590, backBottom, 15);
+      ctx.lineTo(590, backBottom);
+      ctx.stroke();
 
       const neonColor = '#baff25';
+      
+      let leftGrad = ctx.createLinearGradient(goalLeft, goalBottom, backLeft, backTop);
+      leftGrad.addColorStop(0, 'rgba(186, 255, 37, 0.35)'); leftGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
+      ctx.fillStyle = leftGrad; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.lineTo(backLeft, backBottom); ctx.fill();
+
+      let rightGrad = ctx.createLinearGradient(goalRight, goalBottom, backRight, backTop);
+      rightGrad.addColorStop(0, 'rgba(186, 255, 37, 0.35)'); rightGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
+      ctx.fillStyle = rightGrad; ctx.beginPath(); ctx.moveTo(goalRight, goalBottom); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
+      
+      let backGrad = ctx.createLinearGradient(0, backBottom, 0, backTop);
+      backGrad.addColorStop(0, 'rgba(186, 255, 37, 0.15)'); backGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
+      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
+      
+      ctx.fillStyle = 'rgba(186, 255, 37, 0.05)';
+      ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backLeft, backTop); ctx.fill();
+
       ctx.strokeStyle = neonColor; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-      ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
-      ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.stroke();
-      ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, top); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
+      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); stroke();
+      ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
 
       if (ball.active) {
           ball.x += ball.vx; ball.y += ball.vy; ball.z += ball.vz;
-          ball.vz -= 0.76; ball.angle += ball.spin;
-          ball.r = ball.baseR * (1 - (720 - ball.y) * 0.0014);
-          if (ball.r < 16) ball.r = 16;
+          ball.vz -= 0.38; ball.angle += ball.spin;
+          ball.r = ball.baseR * (1 - (360 - ball.y) * 0.0028);
+          if (ball.r < 8) ball.r = 8;
 
           let ballRenderY = ball.y - ball.z;
           let progress = (goalBottom - ball.y) / (goalBottom - backBottom);
@@ -654,13 +765,13 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
           let currentTop = goalTop + (backTop - goalTop) * progress;
 
           if (ball.y <= goalBottom && ball.y > backBottom - ball.r) {
-              if (Math.abs(ball.y - goalBottom) < 16) {
-                  let hitLeft = Math.abs(ball.x - goalLeft) < ball.r + 4;
-                  let hitRight = Math.abs(ball.x - goalRight) < ball.r + 4;
-                  let hitTraversa = Math.abs(ballRenderY - goalTop) < ball.r + 4 && ball.x >= goalLeft && ball.x <= goalRight;
+              if (Math.abs(ball.y - goalBottom) < 8) {
+                  let hitLeft = Math.abs(ball.x - goalLeft) < ball.r + 2;
+                  let hitRight = Math.abs(ball.x - goalRight) < ball.r + 2;
+                  let hitTraversa = Math.abs(ballRenderY - goalTop) < ball.r + 2 && ball.x >= goalLeft && ball.x <= goalRight;
 
                   if ((hitLeft || hitRight) && ballRenderY >= goalTop && ballRenderY <= goalBottom) {
-                      ball.vy = -ball.vy * 0.35; ball.vx = hitLeft ? -6.0 : 6.0;
+                      ball.vy = -ball.vy * 0.35; ball.vx = hitLeft ? -3.0 : 3.0;
                       if(!ball.hasDecidedResult) { showFeedback("PALO!"); ball.hasDecidedResult = true; }
                   } 
                   else if (hitTraversa) {
@@ -671,16 +782,19 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
               if (ball.x > currentLeft && ball.x < currentRight && ballRenderY > currentTop && ballRenderY < goalBottom) {
                   if (!ball.hasDecidedResult) { 
-                      showFeedback("GOAL!"); ball.hasDecidedResult = true; 
+                      showFeedback("GOAL!"); 
+                      ball.hasDecidedResult = true; 
                       setTimeout(() => {
                           document.getElementById('gameModal').style.display = 'none';
                           resetBall();
                           if(window.randomizePositions && !window.isCountdownMode) window.randomizePositions();
                       }, 1500);
                   }
+
                   if (ball.y <= backBottom + ball.r) { ball.y = backBottom + ball.r; ball.vy = -ball.vy * 0.15; ball.vx *= 0.25; ball.vz *= 0.25; }
                   if (ball.x <= currentLeft + ball.r) { ball.x = currentLeft + ball.r; ball.vx = -ball.vx * 0.25; }
                   if (ball.x >= currentRight - ball.r) { ball.x = currentRight - ball.r; ball.vx = -ball.vx * 0.25; }
+                  if (ballRenderY <= currentTop + ball.r) { ball.z = ball.y - (currentTop + ball.r); ball.vz = -ball.vz * 0.25; }
               }
           } 
           
@@ -695,55 +809,57 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
               } else { ball.vx = 0; ball.vy = 0; ball.vz = 0; ball.spin = 0; }
           }
 
-          if (Math.abs(ball.vx) < 0.2 && Math.abs(ball.vy) < 0.2 && ball.z <= 0) {
+          if (Math.abs(ball.vx) < 0.1 && Math.abs(ball.vy) < 0.1 && ball.z <= 0) {
               if (!ball.hasDecidedResult) { showFeedback("CORTO!"); ball.hasDecidedResult = true; }
               ball.active = false; setTimeout(resetBall, 1500);
           }
       }
 
       ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath();
-      let shadowScale = Math.max(0.3, 1 - (ball.z * 0.003));
+      let shadowScale = Math.max(0.3, 1 - (ball.z * 0.006));
       ctx.ellipse(ball.x, ball.y, ball.r * shadowScale, ball.r * 0.38 * shadowScale, 0, 0, Math.PI * 2);
       ctx.fill(); ctx.restore();
 
       ctx.save(); let currentRenderY = ball.y - ball.z; ctx.translate(ball.x, currentRenderY); ctx.rotate(ball.angle);
+
       if (ballImgLoaded) {
           ctx.drawImage(ballImg, -ball.r, -ball.r, ball.r * 2, ball.r * 2);
       } else {
           ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(0, 0, ball.r, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#1e222b'; ctx.lineWidth = 1.3; ctx.stroke();
+          ctx.fillStyle = '#1e222b'; ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+              let angle = (Math.PI * 2 / 5) * i - Math.PI/2; let px = Math.cos(angle) * (ball.r * 0.38); let py = Math.sin(angle) * (ball.r * 0.38);
+              if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath(); ctx.fill();
+          for (let i = 0; i < 5; i++) {
+              let angle = (Math.PI * 2 / 5) * i - Math.PI/2; ctx.beginPath(); ctx.moveTo(Math.cos(angle) * (ball.r * 0.38), Math.sin(angle) * (ball.r * 0.38)); ctx.lineTo(Math.cos(angle) * ball.r, Math.sin(angle) * ball.r); ctx.stroke();
+          }
       }
       ctx.restore();
 
-      if (mouse.isDown && !ball active) {
-          power += 4.4 * chargeDir; if (power >= 100 || power <= 0) chargeDir *= -1;
-          ctx.strokeStyle = '#b0ff33'; ctx.lineWidth = 8; ctx.beginPath();
-          ctx.arc(targetX, targetY, 44, -Math.PI/2, (-Math.PI/2) + (Math.PI * 2 * (power / 100))); ctx.stroke();
+      if (mouse.isDown && !ball.active) {
+          power += 2.2 * chargeDir; if (power >= 100 || power <= 0) chargeDir *= -1;
+          ctx.strokeStyle = '#b0ff33'; ctx.lineWidth = 4; ctx.beginPath();
+          ctx.arc(targetX, targetY, 22, -Math.PI/2, (-Math.PI/2) + (Math.PI * 2 * (power / 100))); ctx.stroke();
       }
 
       requestAnimationFrame(draw);
   }
 
-  // CALCOLO AVANZATO DEL TOCCOROTATO / SCALATO ANCORATO SULL'ASSE CENTRALE
+  // COORDINATE MAPPING OTTIMIZZATO PER ROTAZIONE 90 GRADI
   function getCanvasPos(e) {
       const rect = canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       
-      const canvasCenterX = rect.left + rect.width / 2;
-      const canvasCenterY = rect.top + rect.height / 2;
+      const xVisual = clientY - rect.top;
+      const yVisual = rect.right - clientX;
       
-      let dx = clientX - canvasCenterX;
-      let dy = clientY - canvasCenterY;
+      const x = (xVisual / rect.height) * W; 
+      const y = (yVisual / rect.width) * H;
       
-      if (isCurrentlyRotated) {
-          const temp = dx; dx = dy; dy = -temp;
-      }
-      
-      const visualW = isCurrentlyRotated ? rect.height : rect.width;
-      const visualH = isCurrentlyRotated ? rect.width : rect.height;
-      
-      const x = (W / 2) + (dx * (W / visualW));
-      const y = (H / 2) + (dy * (H / visualH));
       return { x, y };
   }
 
@@ -762,11 +878,11 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       if (!mouse.isDown || ball.active) return; mouse.isDown = false; aimDot.style.display = 'none';
       const dx = targetX - ball.x; const dy = targetY - ball.y;
       ball.active = true; ball.hasDecidedResult = false; ball.bounceCount = 0;
-      let force = 0.58 + (power * 0.006); ball.vx = (dx / 14) * force; ball.vy = -9.0; ball.vz = (Math.abs(dy) / 8.2) * force; ball.spin = (dx * 0.001) * (power * 0.012);
+      let force = 0.58 + (power * 0.006); ball.vx = (dx / 14) * force; ball.vy = -4.5; ball.vz = (Math.abs(dy) / 8.2) * force; ball.spin = (dx * 0.001) * (power * 0.012);
   }
 
   function resetBall() {
-      ball.x = W / 2; ball.y = 720; ball.z = 0; ball.vx = 0; ball.vy = 0; ball.vz = 0; ball.angle = 0; ball.spin = 0; ball.r = ball.baseR; ball.active = false; ball.hasDecidedResult = false; ball.bounceCount = 0; msg.style.opacity = 0;
+      ball.x = W / 2; ball.y = 360; ball.z = 0; ball.vx = 0; ball.vy = 0; ball.vz = 0; ball.angle = 0; ball.spin = 0; ball.r = ball.baseR; ball.active = false; ball.hasDecidedResult = false; ball.bounceCount = 0; msg.style.opacity = 0;
   }
 
   function showFeedback(text) { msg.innerText = text; msg.style.opacity = 1; }
@@ -777,10 +893,17 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   draw();
 }
 
-// Controllo attivazione Coppa
-document.getElementById('openPopupBtn').addEventListener('click', () => {
-    requestNativeFullscreen();
-    document.getElementById('gameModal').style.display = 'flex';
+// --- LOGICA DI CONTROLLO DEI POP-UP ---
+document.addEventListener('DOMContentLoaded', () => {
+  const openTrophyBtn = document.getElementById('openPopupBtn');
+  const gameModal = document.getElementById('gameModal');
+
+  if (openTrophyBtn && gameModal) {
+    openTrophyBtn.addEventListener('click', () => {
+      gameModal.style.display = 'flex';
+      if (window.resizeGame) window.resizeGame(); 
+    });
+  }
 });
 </script>
 </body>
