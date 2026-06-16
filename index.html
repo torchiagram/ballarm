@@ -523,7 +523,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     pinsEl.innerHTML='';
     const ps=pinSize();
     MATCHES.forEach(m=>{
-      const pin = document.createElement('div');pin.className='match-pin';
+      const pin=document.createElement('div');pin.className='match-pin';
       pin.style.width=ps+'px';pin.style.height=ps+'px';
       const c=document.createElement('div');c.className='pin-circle';
       const img=document.createElement('img');img.src=m.imgSrc;img.alt=m.label;
@@ -596,13 +596,11 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   }
 
   window.randomizePositions = function() {
-    // Lista degli orari specifici richiesti (tutti spaccati sull'ora esatta)
     const allowedHours = ['00:00', '01:00', '03:00', '04:00', '06:00', '18:00', '19:00', '21:00', '22:00', '23:00'];
     let pool = [...allowedHours];
     
     MATCHES.forEach(m => {
       if (pool.length === 0) pool = [...allowedHours];
-      // Seleziona un orario a caso dal pool rimanente
       const randomIndex = Math.floor(Math.random() * pool.length);
       const chosenTime = pool.splice(randomIndex, 1)[0];
       
@@ -610,7 +608,6 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       m.angle = parseTimeToAngle(chosenTime);
     });
 
-    // Sincronizza anche la grafica della notifica a comparsa con il primo match aggiornato
     const notifTimeEl = document.querySelector('.notif-time');
     if (notifTimeEl && MATCHES.length > 0) {
       notifTimeEl.textContent = MATCHES[0].time;
@@ -810,7 +807,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       
       let backGrad = ctx.createLinearGradient(0, backBottom, 0, backTop);
       backGrad.addColorStop(0, 'rgba(186, 255, 37, 0.15)'); backGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
-      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, top); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
+      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
       
       ctx.fillStyle = 'rgba(186, 255, 37, 0.05)';
       ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backLeft, backTop); ctx.fill();
@@ -818,7 +815,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       ctx.strokeStyle = neonColor; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
       ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.stroke();
-      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); stroke();
+      ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(backLeft, backTop); ctx.moveTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.stroke();
       ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(goalLeft, goalBottom); ctx.lineTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(goalRight, goalBottom); ctx.stroke();
 
       if (ball.active) {
