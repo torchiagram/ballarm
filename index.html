@@ -282,7 +282,7 @@ html,body{width:100%;height:100%;background:var(--dark);overflow:hidden;font-fam
         <rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
       </svg>
       <span class="mc-label">Match</span>
-      <span class="mc-num" id="matchCount">2</span>
+      <span class="mc-num" id="matchCount">6</span>
     </div>
     <button class="trophy-btn" id="openPopupBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -412,8 +412,12 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 // --- LOGICA SCRIPT 1 (MATCH ALARM) ---
 {
   const MATCHES = [
-    {imgSrc:'img/match1.png', emoji:'🇺🇸🇨🇷', label:'USA vs Costa Rica',   time:'2:30 AM', date:'13 Giugno 2026', country:'USA'},
+    {imgSrc:'img/match1.png', emoji:'🇺🇸🇨🇷', label:'USA vs Costa Rica',     time:'2:30 AM', date:'13 Giugno 2026', country:'USA'},
     {imgSrc:'img/match2.png', emoji:'🇲🇽🇿🇦', label:'Messico vs Sud Africa', time:'8:00 PM', date:'14 Giugno 2026', country:'MEX'},
+    {imgSrc:'img/match3.png', emoji:'🇨🇦🇦🇺', label:'Canada vs Australia',   time:'10:00 PM', date:'15 Giugno 2026', country:'CAN'},
+    {imgSrc:'img/match4.png', emoji:'🇧🇷🇯🇵', label:'Brasile vs Giappone',   time:'4:00 PM', date:'16 Giugno 2026', country:'USA'},
+    {imgSrc:'img/match5.png', emoji:'🇦🇷🇨🇭', label:'Argentina vs Svizzera', time:'6:00 PM', date:'17 Giugno 2026', country:'USA'},
+    {imgSrc:'img/match6.png', emoji:'🇮🇹🇪🇸', label:'Italia vs Spagna',      time:'9:00 PM', date:'18 Giugno 2026', country:'USA'}
   ];
 
   function parseTimeToAngle(timeStr) {
