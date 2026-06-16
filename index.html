@@ -411,24 +411,9 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
 
 // --- LOGICA SCRIPT 1 (MATCH ALARM) ---
 {
-  // Elenco orari disponibili e validi richiesti (esattamente sulle 12 ore principali)
-  const ALLOWED_TIMES = [
-    '00:00', '01:00', '03:00', '04:00', '06:00',
-    '18:00', '19:00', '21:00', '22:00', '23:00'
-  ];
-
-  // Funzione helper per pescare orari unici in modo randomico
-  function getRandomTimes(count) {
-    let shuffled = [...ALLOWED_TIMES].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  }
-
-  // Generiamo due orari random all'avvio dal set stabilito
-  const randomTimes = getRandomTimes(2);
-
   const MATCHES = [
-    {imgSrc:'img/match1.png', emoji:'🇺🇸🇨🇷', label:'USA vs Costa Rica',   time: randomTimes[0], date:'13 Giugno 2026', country:'USA'},
-    {imgSrc:'img/match2.png', emoji:'🇲🇽🇿🇦', label:'Messico vs Sud Africa', time: randomTimes[1], date:'14 Giugno 2026', country:'MEX'},
+    {imgSrc:'img/match1.png', emoji:'🇺🇸🇨🇷', label:'USA vs Costa Rica',   time:'2:30 AM', date:'13 Giugno 2026', country:'USA'},
+    {imgSrc:'img/match2.png', emoji:'🇲🇽🇿🇦', label:'Messico vs Sud Africa', time:'8:00 PM', date:'14 Giugno 2026', country:'MEX'},
   ];
 
   function parseTimeToAngle(timeStr) {
@@ -538,7 +523,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
     pinsEl.innerHTML='';
     const ps=pinSize();
     MATCHES.forEach(m=>{
-      const pin=document.createElement('div');pin.className='match-pin';
+      const pin = document.createElement('div');pin.className='match-pin';
       pin.style.width=ps+'px';pin.style.height=ps+'px';
       const c=document.createElement('div');c.className='pin-circle';
       const img=document.createElement('img');img.src=m.imgSrc;img.alt=m.label;
@@ -611,16 +596,25 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
   }
 
   window.randomizePositions = function() {
-    // Al cambio campo o reset ricalcoliamo due nuovi orari random validi dall'elenco
-    const newTimes = getRandomTimes(2);
-    MATCHES[0].time = newTimes[0];
-    MATCHES[0].angle = parseTimeToAngle(newTimes[0]);
-    MATCHES[1].time = newTimes[1];
-    MATCHES[1].angle = parseTimeToAngle(newTimes[1]);
+    // Lista degli orari specifici richiesti (tutti spaccati sull'ora esatta)
+    const allowedHours = ['00:00', '01:00', '03:00', '04:00', '06:00', '18:00', '19:00', '21:00', '22:00', '23:00'];
+    let pool = [...allowedHours];
+    
+    MATCHES.forEach(m => {
+      if (pool.length === 0) pool = [...allowedHours];
+      // Seleziona un orario a caso dal pool rimanente
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      const chosenTime = pool.splice(randomIndex, 1)[0];
+      
+      m.time = chosenTime;
+      m.angle = parseTimeToAngle(chosenTime);
+    });
 
-    // Aggiorniamo i testi all'interno della notifica/interfaccia visiva
+    // Sincronizza anche la grafica della notifica a comparsa con il primo match aggiornato
     const notifTimeEl = document.querySelector('.notif-time');
-    if (notifTimeEl) notifTimeEl.textContent = MATCHES[0].time;
+    if (notifTimeEl && MATCHES.length > 0) {
+      notifTimeEl.textContent = MATCHES[0].time;
+    }
 
     ballAngle = Math.floor(Math.random() * 360);
     alarmTriggered = false; 
@@ -816,7 +810,7 @@ document.getElementById('templateSelect').addEventListener('change', (e) => {
       
       let backGrad = ctx.createLinearGradient(0, backBottom, 0, backTop);
       backGrad.addColorStop(0, 'rgba(186, 255, 37, 0.15)'); backGrad.addColorStop(1, 'rgba(186, 255, 37, 0.02)');
-      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, backTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
+      ctx.fillStyle = backGrad; ctx.beginPath(); ctx.moveTo(backLeft, backBottom); ctx.lineTo(backLeft, top); ctx.lineTo(backRight, backTop); ctx.lineTo(backRight, backBottom); ctx.fill();
       
       ctx.fillStyle = 'rgba(186, 255, 37, 0.05)';
       ctx.beginPath(); ctx.moveTo(goalLeft, goalTop); ctx.lineTo(goalRight, goalTop); ctx.lineTo(backRight, backTop); ctx.lineTo(backLeft, backTop); ctx.fill();
